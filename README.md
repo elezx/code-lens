@@ -8,8 +8,8 @@ After every `Write`/`Edit`/`Bash` tool call, Code-Lens automatically runs:
 
 | Sensor | What it checks | Hook |
 |--------|---------------|------|
-| **format** | Prettier, Biome, Black, Ruff, gofmt, rustfmt, shfmt, sql-formatter | PostToolUse |
-| **lint** | ESLint, Biome, Oxlint, Ruff, golangci-lint, Clippy, ShellCheck, markdownlint, yamllint, hadolint, sql-lint | PostToolUse |
+| **format** | Prettier, Biome, Black, Ruff, gofmt, rustfmt, CSharpier, dotnet-format, shfmt, sql-formatter | PostToolUse |
+| **lint** | ESLint, Biome, Oxlint, Ruff, golangci-lint, Clippy, dotnet-format, ShellCheck, markdownlint, yamllint, hadolint, sql-lint | PostToolUse |
 | **typecheck** | `tsc --noEmit` for TypeScript files | PostToolUse |
 | **bash-detect** | Detects files modified by `sed`, `cat`, `tee`, `mv`, `cp`, `perl`, `awk` | PostToolUse |
 | **block-dangerous** | Blocks `rm -rf /`, `DROP TABLE`, force-push main, fork bombs, `.env` edits | PreToolUse |
@@ -54,6 +54,7 @@ code-lens/
     "python": ["ruff", "black"],
     "go": ["gofmt"],
     "rust": ["rustfmt"],
+    "csharp": ["csharpier", "dotnet-format"],
     "shell": ["shfmt"]
   },
   "linters": {
@@ -62,6 +63,7 @@ code-lens/
     "python": ["ruff"],
     "go": ["golangci-lint"],
     "rust": ["clippy"],
+    "csharp": ["dotnet-format"],
     "shell": ["shellcheck"]
   }
 }
