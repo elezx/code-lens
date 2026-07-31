@@ -32,12 +32,12 @@
   },
   "analyzers": {
     "ast-grep": true,
-    "code-inspector": true
+    "lizard": true
   },
   "complexity": {
     "cyclomatic": 15,
-    "cognitive": 15,
-    "lines": 50
+    "nloc": 50,
+    "params": 5
   },
   "testRunners": ["vitest", "jest", "npm test"],
   "safety": {

@@ -12,7 +12,7 @@ After every `Write`/`Edit`/`Bash` tool call, Code-Lens automatically runs:
 | **lint** | ESLint, Biome, Oxlint, Ruff, golangci-lint, Clippy, dotnet-format, ShellCheck, markdownlint, yamllint, hadolint, sql-lint | PostToolUse |
 | **typecheck** | `tsc --noEmit` for TypeScript files | PostToolUse |
 | **ast-grep** | 22 structural rules across TS/JS, Python, Go, Rust, C# | PostToolUse |
-| **complexity** | Cyclomatic / cognitive complexity and function length via code-inspector | PostToolUse |
+| **complexity** | Cyclomatic complexity, function length, and parameter count via lizard (27 languages) | PostToolUse |
 | **bash-detect** | Detects files modified by `sed`, `cat`, `tee`, `mv`, `cp`, `perl`, `awk` | PostToolUse |
 | **block-dangerous** | Blocks `rm -rf /`, `DROP TABLE`, force-push main, fork bombs, `.env` edits | PreToolUse |
 | **verify-tests** | Prevents agent from stopping while tests are red | Stop |
@@ -46,7 +46,8 @@ code-lens/
 │       └── shared/              # 3 cross-language rules
 ├── hooks/
 │   ├── hooks.json               # Hook configuration (exec form)
-│   └── code-lens.mjs            # Single entry point, zero deps
+│   ├── code-lens.mjs            # Single entry point, zero deps
+│   └── lizard-json.py           # lizard Python API → JSON metrics
 ├── claude-plugin.json           # Marketplace submission manifest
 ├── code-lens.config.json        # Tool preferences, safety rules, timeouts
 ├── LICENSE                      # MIT
@@ -159,13 +160,13 @@ Disable the sensor entirely with `"analyzers": { "ast-grep": false }`.
 
 ## Complexity / SRP analysis
 
-The `complexity` sensor runs [code-inspector](https://github.com/miguelbravo7/code-inspector)
-over the edited file and reports any function that crosses a threshold:
+The `complexity` sensor runs [lizard](https://github.com/terryyin/lizard) over the edited
+file and reports any function that crosses a threshold:
 
 ```
 --- complexity: src/checkout.ts ---
   applyDiscounts (L142): cyclomatic 22 > 15
-  buildOrder (L61): cognitive 19 > 15, lines 84 > 50
+  buildOrder (L61): nloc 84 > 50, params 7 > 5
   A function over these thresholds is usually doing more than one job — split it.
 ```
 
@@ -175,26 +176,28 @@ Thresholds are configurable:
 {
   "analyzers": {
     "ast-grep": true,
-    "code-inspector": true
+    "lizard": true
   },
   "complexity": {
     "cyclomatic": 15,
-    "cognitive": 15,
-    "lines": 50
+    "nloc": 50,
+    "params": 5
   }
 }
 ```
 
-Install the binary with:
+Install it with:
 
 ```bash
-go install github.com/miguelbravo7/code-inspector/cmd/code-inspector@latest
+pip install lizard
 ```
 
-The JSON report is walked rather than indexed by a fixed schema, so the common spellings
-of each metric (`cyclomatic_complexity`, `cyclomaticComplexity`, `ccn`, `loc`, `nloc`, …)
-are all recognised. When the binary is absent, or its output is not JSON, the sensor
-stays silent — like every other sensor, it exits 0 and never blocks the agent.
+lizard covers 27 languages (C/C++, C#, Java, JavaScript, TypeScript, Python, Go, Rust,
+Swift, Kotlin, Scala, Ruby, PHP, Zig, …) and ships a Python API. The sensor calls that
+API through `hooks/lizard-json.py`, which prints one JSON array of
+`{ name, line, cyclomatic, nloc, params }` records — a fixed shape, so no schema guessing
+is needed. When lizard is not installed, or its output is not JSON, the sensor stays
+silent — like every other sensor, it exits 0 and never blocks the agent.
 
 ## SessionStart detection
 
@@ -207,7 +210,7 @@ code-lens v2.0.0 — sensors active
   ✓ eslint (9.0.0)
   ✓ tsc (5.5.0)
   ✗ biome — install: npm install --save-dev @biomejs/biome
-  ✗ code-inspector — install: go install github.com/miguelbravo7/code-inspector/cmd/code-inspector@latest
+  ✗ lizard — install: pip install lizard
   ✗ oxlint — install: npm install --save-dev oxlint
   ✗ ruff — install: pip install ruff
   project: my-project · platform: darwin
