@@ -1,0 +1,23 @@
+# The default object is created once at def time and shared by every call.
+id: no-mutable-defaults
+language: Python
+severity: error
+message: "Mutable default argument is shared across all calls — use `None` and build the value inside the function."
+rule:
+  all:
+    - any:
+        - kind: default_parameter
+        - kind: typed_default_parameter
+    - has:
+        field: value
+        stopBy: neighbor
+        any:
+          - kind: list
+          - kind: dictionary
+          - kind: set
+          - kind: list_comprehension
+          - kind: dictionary_comprehension
+          - kind: set_comprehension
+          - all:
+              - kind: call
+              - regex: '^(list|dict|set|bytearray|collections\.[A-Za-z_]+|defaultdict|OrderedDict|Counter|deque)\('

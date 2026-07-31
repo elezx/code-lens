@@ -1,0 +1,7 @@
+id: no-bare-except
+language: Python
+severity: error
+message: "Bare `except:` swallows KeyboardInterrupt and SystemExit — catch `Exception`, or the specific error you can handle."
+rule:
+  kind: except_clause
+  regex: '^except\s*:'

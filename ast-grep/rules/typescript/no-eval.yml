@@ -1,0 +1,28 @@
+id: no-eval
+language: TypeScript
+severity: error
+message: "`eval` executes arbitrary code and defeats every static check — restructure so the input is data, not code."
+rule:
+  any:
+    - pattern: eval($$$ARGS)
+    - pattern: new Function($$$ARGS)
+
+---
+id: no-eval-tsx
+language: Tsx
+severity: error
+message: "`eval` executes arbitrary code and defeats every static check — restructure so the input is data, not code."
+rule:
+  any:
+    - pattern: eval($$$ARGS)
+    - pattern: new Function($$$ARGS)
+
+---
+id: no-eval-js
+language: JavaScript
+severity: error
+message: "`eval` executes arbitrary code and defeats every static check — restructure so the input is data, not code."
+rule:
+  any:
+    - pattern: eval($$$ARGS)
+    - pattern: new Function($$$ARGS)

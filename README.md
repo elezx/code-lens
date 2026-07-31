@@ -11,6 +11,8 @@ After every `Write`/`Edit`/`Bash` tool call, Code-Lens automatically runs:
 | **format** | Prettier, Biome, Black, Ruff, gofmt, rustfmt, CSharpier, dotnet-format, shfmt, sql-formatter | PostToolUse |
 | **lint** | ESLint, Biome, Oxlint, Ruff, golangci-lint, Clippy, dotnet-format, ShellCheck, markdownlint, yamllint, hadolint, sql-lint | PostToolUse |
 | **typecheck** | `tsc --noEmit` for TypeScript files | PostToolUse |
+| **ast-grep** | 22 structural rules across TS/JS, Python, Go, Rust, C# | PostToolUse |
+| **complexity** | Cyclomatic / cognitive complexity and function length via code-inspector | PostToolUse |
 | **bash-detect** | Detects files modified by `sed`, `cat`, `tee`, `mv`, `cp`, `perl`, `awk` | PostToolUse |
 | **block-dangerous** | Blocks `rm -rf /`, `DROP TABLE`, force-push main, fork bombs, `.env` edits | PreToolUse |
 | **verify-tests** | Prevents agent from stopping while tests are red | Stop |
@@ -33,9 +35,18 @@ code-lens/
 │   └── plugin.json              # Manifest
 ├── .github/workflows/
 │   └── validate.yml             # CI: manifest + hook validation
+├── ast-grep/
+│   ├── sgconfig.yml             # ruleDirs (relative to this file)
+│   └── rules/
+│       ├── typescript/          # 5 rules (TypeScript + Tsx + JavaScript)
+│       ├── python/              # 5 rules
+│       ├── go/                  # 3 rules
+│       ├── rust/                # 3 rules
+│       ├── csharp/              # 3 rules
+│       └── shared/              # 3 cross-language rules
 ├── hooks/
 │   ├── hooks.json               # Hook configuration (exec form)
-│   └── code-lens.mjs            # Single entry point (782 lines, zero deps)
+│   └── code-lens.mjs            # Single entry point, zero deps
 ├── claude-plugin.json           # Marketplace submission manifest
 ├── code-lens.config.json        # Tool preferences, safety rules, timeouts
 ├── LICENSE                      # MIT
@@ -71,20 +82,138 @@ code-lens/
 
 Override by creating `code-lens.config.json` in your project root — it merges with defaults.
 
+## ast-grep rules
+
+Formatters and linters catch style and type problems. The `ast-grep` sensor catches
+*structural* ones — patterns that are syntactically fine but wrong in practice. Every
+rule matches against the AST, not text, so comments and string literals do not produce
+false hits.
+
+Rules live in `ast-grep/rules/<language>/` and are wired together by `ast-grep/sgconfig.yml`.
+
+| Language | Rule | Severity | What it flags |
+|----------|------|----------|---------------|
+| TypeScript / JS | `no-console-log` | warning | `console.log(...)` left in source |
+| | `no-any-type` | warning | `any` annotations |
+| | `prefer-const` | hint | `let` that is never reassigned |
+| | `no-await-in-loop` | warning | `await` inside `for`/`while`/`do` (not `for await`) |
+| | `no-eval` | error | `eval(...)`, `new Function(...)` |
+| Python | `no-bare-except` | error | `except:` with no exception type |
+| | `no-mutable-defaults` | error | `def f(x=[])`, `{}`, `set()`, comprehensions |
+| | `no-eval-py` | error | `eval(...)`, `exec(...)` |
+| | `use-generators` | hint | `sum([...])` and friends — drop the brackets |
+| | `no-assert-on-tuple` | error | `assert (x, y)` — always truthy |
+| Go | `no-bare-return` | warning | naked `return` in a function with named results |
+| | `defer-in-loop` | warning | `defer` inside a `for` |
+| | `no-unused-params` | hint | parameter never referenced in the body |
+| Rust | `no-unwrap` | warning | `.unwrap()` |
+| | `no-expect-message` | warning | `.expect("")` with an empty message |
+| | `unsafe-without-block` | error | `unsafe fn` with no `unsafe { }` inside |
+| C# | `no-empty-catch` | warning | `catch { }` |
+| | `no-throw-exception` | warning | `throw new Exception(...)` |
+| | `async-void` | error | `async void` methods |
+| Shared | `no-todo-fixme` | hint | `TODO` / `FIXME` / `HACK` / `XXX` comments |
+| | `max-function-lines` | warning | functions longer than 50 lines |
+| | `max-params` | warning | more than 5 parameters |
+
+Each rule file holds one rule per language it covers, separated by `---`, so the
+TypeScript rules also apply to `.tsx` and `.js` and the shared rules apply to all six
+languages. Rule ids carry a language suffix (`max-params-go`, `no-todo-fixme-rs`) because
+ast-grep requires ids to be unique across the whole project.
+
+Install the binary with:
+
+```bash
+npm install -g @ast-grep/cli
+```
+
+Run the rule set manually over a whole tree:
+
+```bash
+ast-grep scan -c /path/to/code-lens/ast-grep/sgconfig.yml .
+```
+
+### Known approximations
+
+Three rules cannot be expressed exactly in ast-grep and deliberately under-report
+rather than produce false positives:
+
+- **`prefer-const`** skips any binding that is reassigned anywhere in an enclosing
+  scope, including outer scopes, and only matches untyped `let x = ...` declarations.
+- **`no-unused-params`** (Go) checks whether the parameter name appears anywhere in
+  the body; grouped parameters (`func f(a, b int)`) are only checked on their first name,
+  and `_` is exempt.
+- **`max-function-lines`** counts newlines with a regex over the node text, and matches
+  nested closures on their own — a long function containing a long closure reports twice.
+
+### Adding your own rules
+
+Drop a `.yml` file into any `ast-grep/rules/<language>/` directory, or add a directory
+to `ruleDirs` in `sgconfig.yml`. Test it before wiring it in:
+
+```bash
+ast-grep scan -r my-rule.yml path/to/fixture.ts --report-style short
+```
+
+Disable the sensor entirely with `"analyzers": { "ast-grep": false }`.
+
+## Complexity / SRP analysis
+
+The `complexity` sensor runs [code-inspector](https://github.com/miguelbravo7/code-inspector)
+over the edited file and reports any function that crosses a threshold:
+
+```
+--- complexity: src/checkout.ts ---
+  applyDiscounts (L142): cyclomatic 22 > 15
+  buildOrder (L61): cognitive 19 > 15, lines 84 > 50
+  A function over these thresholds is usually doing more than one job — split it.
+```
+
+Thresholds are configurable:
+
+```json
+{
+  "analyzers": {
+    "ast-grep": true,
+    "code-inspector": true
+  },
+  "complexity": {
+    "cyclomatic": 15,
+    "cognitive": 15,
+    "lines": 50
+  }
+}
+```
+
+Install the binary with:
+
+```bash
+go install github.com/miguelbravo7/code-inspector/cmd/code-inspector@latest
+```
+
+The JSON report is walked rather than indexed by a fixed schema, so the common spellings
+of each metric (`cyclomatic_complexity`, `cyclomaticComplexity`, `ccn`, `loc`, `nloc`, …)
+are all recognised. When the binary is absent, or its output is not JSON, the sensor
+stays silent — like every other sensor, it exits 0 and never blocks the agent.
+
 ## SessionStart detection
 
 On every session start, Code-Lens scans your project and reports:
 
 ```
 code-lens v2.0.0 — sensors active
+  ✓ ast-grep (0.42.2)
   ✓ prettier (3.3.0)
   ✓ eslint (9.0.0)
   ✓ tsc (5.5.0)
   ✗ biome — install: npm install --save-dev @biomejs/biome
+  ✗ code-inspector — install: go install github.com/miguelbravo7/code-inspector/cmd/code-inspector@latest
   ✗ oxlint — install: npm install --save-dev oxlint
   ✗ ruff — install: pip install ruff
   project: my-project · platform: darwin
 ```
+
+Analyzers are listed when any language they cover is detected in the project.
 
 ## Requirements
 

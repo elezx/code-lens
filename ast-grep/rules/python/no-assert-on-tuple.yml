@@ -1,0 +1,11 @@
+# `assert (cond, "msg")` asserts a 2-tuple, which is always truthy — the test
+# never fails. The intended form is `assert cond, "msg"`.
+id: no-assert-on-tuple
+language: Python
+severity: error
+message: "`assert` on a tuple is always true — write `assert cond, \"msg\"` without the parentheses."
+rule:
+  kind: assert_statement
+  has:
+    kind: tuple
+    nthChild: 1

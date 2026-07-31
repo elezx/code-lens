@@ -1,0 +1,20 @@
+# A naked `return` in a function with named results returns whatever those
+# variables happen to hold at that point — usually invisible at the call site.
+id: no-bare-return
+language: Go
+severity: warning
+message: "Naked return in a function with named results — return the values explicitly so the reader can see what is returned."
+rule:
+  all:
+    - kind: return_statement
+    - regex: ^return$
+    - inside:
+        stopBy: end
+        any:
+          - kind: function_declaration
+          - kind: method_declaration
+          - kind: func_literal
+        has:
+          field: result
+          stopBy: neighbor
+          kind: parameter_list

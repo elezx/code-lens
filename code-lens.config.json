@@ -30,6 +30,15 @@
   "typecheckers": {
     "typescript": ["tsc"]
   },
+  "analyzers": {
+    "ast-grep": true,
+    "code-inspector": true
+  },
+  "complexity": {
+    "cyclomatic": 15,
+    "cognitive": 15,
+    "lines": 50
+  },
   "testRunners": ["vitest", "jest", "npm test"],
   "safety": {
     "blockedCommands": [
@@ -57,6 +66,7 @@
     "format": 5000,
     "lint": 15000,
     "typecheck": 30000,
+    "analyze": 15000,
     "test": 60000
   },
   "maxReportLines": 50

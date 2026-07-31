@@ -1,0 +1,58 @@
+# Sequential awaits in a loop serialise work that is usually independent.
+# `for await (... of ...)` is excluded — that construct is the intended way to
+# consume an async iterable.
+id: no-await-in-loop
+language: TypeScript
+severity: warning
+message: "`await` inside a loop serialises each iteration — collect the promises and `Promise.all` them if the iterations are independent."
+rule:
+  all:
+    - pattern: await $EXPR
+    - inside:
+        stopBy: end
+        any:
+          - kind: for_statement
+          - kind: while_statement
+          - kind: do_statement
+          - all:
+              - kind: for_in_statement
+              - not:
+                  regex: ^for\s+await\b
+
+---
+id: no-await-in-loop-tsx
+language: Tsx
+severity: warning
+message: "`await` inside a loop serialises each iteration — collect the promises and `Promise.all` them if the iterations are independent."
+rule:
+  all:
+    - pattern: await $EXPR
+    - inside:
+        stopBy: end
+        any:
+          - kind: for_statement
+          - kind: while_statement
+          - kind: do_statement
+          - all:
+              - kind: for_in_statement
+              - not:
+                  regex: ^for\s+await\b
+
+---
+id: no-await-in-loop-js
+language: JavaScript
+severity: warning
+message: "`await` inside a loop serialises each iteration — collect the promises and `Promise.all` them if the iterations are independent."
+rule:
+  all:
+    - pattern: await $EXPR
+    - inside:
+        stopBy: end
+        any:
+          - kind: for_statement
+          - kind: while_statement
+          - kind: do_statement
+          - all:
+              - kind: for_in_statement
+              - not:
+                  regex: ^for\s+await\b

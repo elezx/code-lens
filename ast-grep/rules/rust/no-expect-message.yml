@@ -1,0 +1,10 @@
+# `.expect("")` is `.unwrap()` with extra steps — the panic carries no context.
+id: no-expect-message
+language: Rust
+severity: warning
+message: "`.expect()` with an empty message gives no context on panic — state the invariant that was violated."
+rule:
+  pattern: $EXPR.expect($MSG)
+constraints:
+  MSG:
+    regex: '^"\s*"$'

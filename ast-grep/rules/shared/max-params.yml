@@ -1,0 +1,79 @@
+# `nthChild: 6` asserts a sixth parameter node exists, i.e. more than five.
+# Go reuses parameter_list for named results, so the Go variant is pinned to the
+# `parameters` field; grouped Go params (`a, b int`) count as one node.
+id: max-params
+language: TypeScript
+severity: warning
+message: "More than 5 parameters — group the related ones into an options object."
+rule:
+  kind: formal_parameters
+  has:
+    nthChild: 6
+
+---
+id: max-params-tsx
+language: Tsx
+severity: warning
+message: "More than 5 parameters — group the related ones into an options object."
+rule:
+  kind: formal_parameters
+  has:
+    nthChild: 6
+
+---
+id: max-params-js
+language: JavaScript
+severity: warning
+message: "More than 5 parameters — group the related ones into an options object."
+rule:
+  kind: formal_parameters
+  has:
+    nthChild: 6
+
+---
+id: max-params-py
+language: Python
+severity: warning
+message: "More than 5 parameters — group the related ones into a dataclass or keyword-only block."
+rule:
+  kind: parameters
+  has:
+    nthChild: 6
+
+---
+id: max-params-go
+language: Go
+severity: warning
+message: "More than 5 parameters — group the related ones into a struct."
+rule:
+  all:
+    - kind: parameter_list
+    - inside:
+        stopBy: neighbor
+        field: parameters
+        any:
+          - kind: function_declaration
+          - kind: method_declaration
+          - kind: func_literal
+    - has:
+        nthChild: 6
+
+---
+id: max-params-rs
+language: Rust
+severity: warning
+message: "More than 5 parameters — group the related ones into a struct."
+rule:
+  kind: parameters
+  has:
+    nthChild: 6
+
+---
+id: max-params-cs
+language: CSharp
+severity: warning
+message: "More than 5 parameters — group the related ones into a parameter object."
+rule:
+  kind: parameter_list
+  has:
+    nthChild: 6

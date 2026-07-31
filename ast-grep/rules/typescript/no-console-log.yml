@@ -1,0 +1,23 @@
+id: no-console-log
+language: TypeScript
+severity: warning
+message: "console.log left in source — use a logger or remove it before shipping."
+note: Debug output in committed code leaks into production logs and hides real signal.
+rule:
+  pattern: console.log($$$ARGS)
+
+---
+id: no-console-log-tsx
+language: Tsx
+severity: warning
+message: "console.log left in source — use a logger or remove it before shipping."
+rule:
+  pattern: console.log($$$ARGS)
+
+---
+id: no-console-log-js
+language: JavaScript
+severity: warning
+message: "console.log left in source — use a logger or remove it before shipping."
+rule:
+  pattern: console.log($$$ARGS)

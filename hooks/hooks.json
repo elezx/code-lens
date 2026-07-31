@@ -46,6 +46,18 @@
             "command": "node",
             "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/code-lens.mjs", "typecheck"],
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/code-lens.mjs", "ast-grep"],
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/code-lens.mjs", "complexity"],
+            "timeout": 30
           }
         ]
       },

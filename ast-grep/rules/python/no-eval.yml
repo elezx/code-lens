@@ -1,0 +1,8 @@
+id: no-eval-py
+language: Python
+severity: error
+message: "`eval`/`exec` run arbitrary code — parse the input instead (`ast.literal_eval`, `json.loads`, or a dispatch table)."
+rule:
+  any:
+    - pattern: eval($$$ARGS)
+    - pattern: exec($$$ARGS)

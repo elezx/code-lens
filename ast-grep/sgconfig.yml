@@ -1,0 +1,10 @@
+# ast-grep project config for the code-lens rule set.
+# ruleDirs are resolved relative to this file, so this config stays portable
+# regardless of where the plugin is installed.
+ruleDirs:
+  - rules/typescript
+  - rules/python
+  - rules/go
+  - rules/rust
+  - rules/csharp
+  - rules/shared

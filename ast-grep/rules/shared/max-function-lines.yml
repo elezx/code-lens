@@ -1,0 +1,96 @@
+# ast-grep has no line-count operator, so the threshold is expressed as a regex
+# over the node's own text: 50 newlines means the body spans more than 50 lines.
+# Nested closures are matched on their own, so a long function containing a long
+# closure reports twice.
+id: max-function-lines
+language: TypeScript
+severity: warning
+message: "Function is longer than 50 lines — split out the parts that have their own name."
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: function_expression
+        - kind: generator_function
+        - kind: generator_function_declaration
+        - kind: arrow_function
+        - kind: method_definition
+    - regex: '(?:[^\n]*\n){50,}'
+
+---
+id: max-function-lines-tsx
+language: Tsx
+severity: warning
+message: "Function is longer than 50 lines — split out the parts that have their own name."
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: function_expression
+        - kind: generator_function
+        - kind: generator_function_declaration
+        - kind: arrow_function
+        - kind: method_definition
+    - regex: '(?:[^\n]*\n){50,}'
+
+---
+id: max-function-lines-js
+language: JavaScript
+severity: warning
+message: "Function is longer than 50 lines — split out the parts that have their own name."
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: function_expression
+        - kind: generator_function
+        - kind: generator_function_declaration
+        - kind: arrow_function
+        - kind: method_definition
+    - regex: '(?:[^\n]*\n){50,}'
+
+---
+id: max-function-lines-py
+language: Python
+severity: warning
+message: "Function is longer than 50 lines — split out the parts that have their own name."
+rule:
+  all:
+    - kind: function_definition
+    - regex: '(?:[^\n]*\n){50,}'
+
+---
+id: max-function-lines-go
+language: Go
+severity: warning
+message: "Function is longer than 50 lines — split out the parts that have their own name."
+rule:
+  all:
+    - any:
+        - kind: function_declaration
+        - kind: method_declaration
+        - kind: func_literal
+    - regex: '(?:[^\n]*\n){50,}'
+
+---
+id: max-function-lines-rs
+language: Rust
+severity: warning
+message: "Function is longer than 50 lines — split out the parts that have their own name."
+rule:
+  all:
+    - kind: function_item
+    - regex: '(?:[^\n]*\n){50,}'
+
+---
+id: max-function-lines-cs
+language: CSharp
+severity: warning
+message: "Function is longer than 50 lines — split out the parts that have their own name."
+rule:
+  all:
+    - any:
+        - kind: method_declaration
+        - kind: local_function_statement
+        - kind: constructor_declaration
+    - regex: '(?:[^\n]*\n){50,}'

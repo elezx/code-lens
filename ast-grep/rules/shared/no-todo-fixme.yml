@@ -1,0 +1,65 @@
+# TODO/FIXME/HACK/XXX markers, reported as hints so they surface without
+# competing with real defects.
+id: no-todo-fixme
+language: TypeScript
+severity: hint
+message: "Unresolved marker in a comment — resolve it or move it to the issue tracker."
+rule:
+  kind: comment
+  regex: \b(TODO|FIXME|HACK|XXX)\b
+
+---
+id: no-todo-fixme-tsx
+language: Tsx
+severity: hint
+message: "Unresolved marker in a comment — resolve it or move it to the issue tracker."
+rule:
+  kind: comment
+  regex: \b(TODO|FIXME|HACK|XXX)\b
+
+---
+id: no-todo-fixme-js
+language: JavaScript
+severity: hint
+message: "Unresolved marker in a comment — resolve it or move it to the issue tracker."
+rule:
+  kind: comment
+  regex: \b(TODO|FIXME|HACK|XXX)\b
+
+---
+id: no-todo-fixme-py
+language: Python
+severity: hint
+message: "Unresolved marker in a comment — resolve it or move it to the issue tracker."
+rule:
+  kind: comment
+  regex: \b(TODO|FIXME|HACK|XXX)\b
+
+---
+id: no-todo-fixme-go
+language: Go
+severity: hint
+message: "Unresolved marker in a comment — resolve it or move it to the issue tracker."
+rule:
+  kind: comment
+  regex: \b(TODO|FIXME|HACK|XXX)\b
+
+---
+id: no-todo-fixme-rs
+language: Rust
+severity: hint
+message: "Unresolved marker in a comment — resolve it or move it to the issue tracker."
+rule:
+  any:
+    - kind: line_comment
+    - kind: block_comment
+  regex: \b(TODO|FIXME|HACK|XXX)\b
+
+---
+id: no-todo-fixme-cs
+language: CSharp
+severity: hint
+message: "Unresolved marker in a comment — resolve it or move it to the issue tracker."
+rule:
+  kind: comment
+  regex: \b(TODO|FIXME|HACK|XXX)\b

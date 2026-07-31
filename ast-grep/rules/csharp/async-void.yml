@@ -1,0 +1,23 @@
+# An `async void` method cannot be awaited and its exceptions escape onto the
+# synchronization context, where they usually crash the process.
+# `method_declaration` uses the `returns` field, `local_function_statement` uses `type`.
+id: async-void
+language: CSharp
+severity: error
+message: "`async void` cannot be awaited and its exceptions are unobservable — return `Task` (only event handlers are exempt)."
+rule:
+  all:
+    - any:
+        - kind: method_declaration
+        - kind: local_function_statement
+    - has:
+        stopBy: neighbor
+        kind: modifier
+        regex: ^async$
+    - any:
+        - has:
+            field: returns
+            regex: ^void$
+        - has:
+            field: type
+            regex: ^void$

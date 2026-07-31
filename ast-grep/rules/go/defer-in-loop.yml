@@ -1,0 +1,11 @@
+# `defer` runs at function exit, not at the end of the iteration — the resources
+# pile up for the whole loop.
+id: defer-in-loop
+language: Go
+severity: warning
+message: "`defer` inside a loop only runs when the function returns — wrap the body in a closure or release the resource explicitly."
+rule:
+  kind: defer_statement
+  inside:
+    stopBy: end
+    kind: for_statement

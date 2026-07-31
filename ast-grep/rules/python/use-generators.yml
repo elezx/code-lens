@@ -1,0 +1,19 @@
+# A list comprehension handed straight to a consuming builtin materialises the
+# whole list first. Dropping the brackets streams it instead.
+id: use-generators
+language: Python
+severity: hint
+message: "This builtin consumes an iterable — drop the brackets and pass a generator expression to avoid materialising the list."
+rule:
+  all:
+    - kind: call
+    - has:
+        field: function
+        stopBy: neighbor
+        regex: '^(sum|any|all|min|max|sorted|set|frozenset|tuple|dict)$'
+    - has:
+        field: arguments
+        stopBy: neighbor
+        has:
+          stopBy: neighbor
+          kind: list_comprehension

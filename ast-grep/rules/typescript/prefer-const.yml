@@ -1,0 +1,107 @@
+# `let` that is never reassigned anywhere in an enclosing scope.
+# The reassignment probe walks up to `program`, so a binding mutated in any
+# outer or nested scope is left alone — this rule under-reports rather than
+# producing false positives.
+id: prefer-const
+language: TypeScript
+severity: hint
+message: "`let` is never reassigned — declare it `const`."
+rule:
+  all:
+    - pattern: let $VAR = $INIT
+    - not:
+        inside:
+          kind: for_statement
+          stopBy: neighbor
+    - not:
+        inside:
+          stopBy: end
+          any:
+            - kind: program
+            - kind: statement_block
+          has:
+            stopBy: end
+            any:
+              - pattern: $VAR = $RHS
+              - pattern: $VAR += $RHS
+              - pattern: $VAR -= $RHS
+              - pattern: $VAR *= $RHS
+              - pattern: $VAR /= $RHS
+              - pattern: $VAR %= $RHS
+              - pattern: $VAR ??= $RHS
+              - pattern: $VAR ||= $RHS
+              - pattern: $VAR &&= $RHS
+              - pattern: $VAR++
+              - pattern: $VAR--
+              - pattern: ++$VAR
+              - pattern: --$VAR
+
+---
+id: prefer-const-tsx
+language: Tsx
+severity: hint
+message: "`let` is never reassigned — declare it `const`."
+rule:
+  all:
+    - pattern: let $VAR = $INIT
+    - not:
+        inside:
+          kind: for_statement
+          stopBy: neighbor
+    - not:
+        inside:
+          stopBy: end
+          any:
+            - kind: program
+            - kind: statement_block
+          has:
+            stopBy: end
+            any:
+              - pattern: $VAR = $RHS
+              - pattern: $VAR += $RHS
+              - pattern: $VAR -= $RHS
+              - pattern: $VAR *= $RHS
+              - pattern: $VAR /= $RHS
+              - pattern: $VAR %= $RHS
+              - pattern: $VAR ??= $RHS
+              - pattern: $VAR ||= $RHS
+              - pattern: $VAR &&= $RHS
+              - pattern: $VAR++
+              - pattern: $VAR--
+              - pattern: ++$VAR
+              - pattern: --$VAR
+
+---
+id: prefer-const-js
+language: JavaScript
+severity: hint
+message: "`let` is never reassigned — declare it `const`."
+rule:
+  all:
+    - pattern: let $VAR = $INIT
+    - not:
+        inside:
+          kind: for_statement
+          stopBy: neighbor
+    - not:
+        inside:
+          stopBy: end
+          any:
+            - kind: program
+            - kind: statement_block
+          has:
+            stopBy: end
+            any:
+              - pattern: $VAR = $RHS
+              - pattern: $VAR += $RHS
+              - pattern: $VAR -= $RHS
+              - pattern: $VAR *= $RHS
+              - pattern: $VAR /= $RHS
+              - pattern: $VAR %= $RHS
+              - pattern: $VAR ??= $RHS
+              - pattern: $VAR ||= $RHS
+              - pattern: $VAR &&= $RHS
+              - pattern: $VAR++
+              - pattern: $VAR--
+              - pattern: ++$VAR
+              - pattern: --$VAR

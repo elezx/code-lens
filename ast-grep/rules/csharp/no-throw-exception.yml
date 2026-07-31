@@ -1,0 +1,11 @@
+# Callers cannot catch `Exception` selectively, so a generic throw forces them
+# to catch everything or nothing.
+id: no-throw-exception
+language: CSharp
+severity: warning
+message: "Throwing the base `Exception` gives callers nothing to catch on — throw a specific type (ArgumentException, InvalidOperationException, or your own)."
+rule:
+  any:
+    - pattern: throw new Exception($$$ARGS)
+    - pattern: throw new System.Exception($$$ARGS)
+    - pattern: throw new ApplicationException($$$ARGS)

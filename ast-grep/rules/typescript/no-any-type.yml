@@ -1,0 +1,17 @@
+id: no-any-type
+language: TypeScript
+severity: warning
+message: "`any` disables type checking here — use `unknown` and narrow, or name the real type."
+note: One `any` erases inference for everything downstream of it.
+rule:
+  kind: predefined_type
+  regex: ^any$
+
+---
+id: no-any-type-tsx
+language: Tsx
+severity: warning
+message: "`any` disables type checking here — use `unknown` and narrow, or name the real type."
+rule:
+  kind: predefined_type
+  regex: ^any$

@@ -1,0 +1,6 @@
+id: no-unwrap
+language: Rust
+severity: warning
+message: "`.unwrap()` panics on None/Err — propagate with `?`, or use `expect` with a message that explains the invariant."
+rule:
+  pattern: $EXPR.unwrap()

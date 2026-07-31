@@ -1,0 +1,17 @@
+# Pre-2024 editions make the whole body of an `unsafe fn` implicitly unsafe, so
+# the unsafe operations are invisible. An explicit `unsafe { }` block marks them.
+id: unsafe-without-block
+language: Rust
+severity: error
+message: "`unsafe fn` with no `unsafe` block inside — wrap the unsafe operations explicitly so the audited region is visible."
+rule:
+  all:
+    - kind: function_item
+    - has:
+        stopBy: neighbor
+        kind: function_modifiers
+        regex: \bunsafe\b
+    - not:
+        has:
+          stopBy: end
+          kind: unsafe_block

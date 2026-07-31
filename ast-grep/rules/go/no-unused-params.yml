@@ -1,0 +1,44 @@
+# A parameter whose name never appears in the body. Named results are excluded
+# (they share the parameter_declaration kind), as is the blank identifier `_`,
+# which is the deliberate way to say "unused".
+#
+# Grouped parameters (`func f(a, b int)`) declare several names in one node and
+# are only checked on their first name.
+id: no-unused-params
+language: Go
+severity: hint
+message: "Parameter is never used in the body — drop it, or rename it to `_` if the signature is fixed by an interface."
+rule:
+  all:
+    - kind: parameter_declaration
+    - has:
+        field: name
+        stopBy: neighbor
+        pattern: $P
+    - not:
+        inside:
+          stopBy: neighbor
+          kind: parameter_list
+          inside:
+            stopBy: neighbor
+            field: result
+            any:
+              - kind: function_declaration
+              - kind: method_declaration
+              - kind: func_literal
+    - inside:
+        stopBy: end
+        any:
+          - kind: function_declaration
+          - kind: method_declaration
+        has:
+          field: body
+          stopBy: neighbor
+          not:
+            has:
+              stopBy: end
+              pattern: $P
+constraints:
+  P:
+    not:
+      regex: ^_$
