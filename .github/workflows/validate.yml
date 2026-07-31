@@ -1,0 +1,65 @@
+name: Validate Plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate JSON manifests
+        run: |
+          for f in .claude-plugin/plugin.json claude-plugin.json hooks/hooks.json code-lens.config.json; do
+            node -e "JSON.parse(require('fs').readFileSync('$f', 'utf8'))" && echo "ok: $f"
+          done
+
+      - name: Check version consistency
+        run: |
+          node -e "
+            const fs = require('fs');
+            const read = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
+            const plugin = read('.claude-plugin/plugin.json');
+            const market = read('claude-plugin.json');
+            if (plugin.name !== market.name) throw new Error('name mismatch: ' + plugin.name + ' vs ' + market.name);
+            if (plugin.version !== market.version) throw new Error('version mismatch: ' + plugin.version + ' vs ' + market.version);
+            console.log('ok: ' + plugin.name + '@' + plugin.version);
+          "
+
+      - name: Check hook script syntax
+        run: node --check hooks/code-lens.mjs
+
+      - name: Verify hook script paths resolve
+        run: |
+          node -e "
+            const fs = require('fs');
+            const hooks = JSON.parse(fs.readFileSync('hooks/hooks.json', 'utf8')).hooks;
+            let n = 0;
+            for (const [event, matchers] of Object.entries(hooks)) {
+              for (const m of matchers) {
+                for (const h of m.hooks) {
+                  const script = (h.args || [])[0];
+                  if (!script) throw new Error(event + ': hook has no script arg');
+                  const rel = script.split('}/').pop();
+                  if (!fs.existsSync(rel)) throw new Error(event + ': missing ' + rel);
+                  n++;
+                }
+              }
+            }
+            console.log('ok: ' + n + ' hook entries resolve');
+          "
+
+      - name: Smoke-test hook entry points
+        run: |
+          for mode in session-start block-dangerous format lint typecheck bash-detect verify-tests; do
+            echo '{}' | node hooks/code-lens.mjs "$mode" > /dev/null || exit 1
+            echo "ok: $mode"
+          done

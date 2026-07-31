@@ -1,0 +1,61 @@
+{
+  "formatters": {
+    "javascript": ["biome", "prettier"],
+    "typescript": ["biome", "prettier"],
+    "python": ["ruff", "black"],
+    "go": ["gofmt"],
+    "rust": ["rustfmt"],
+    "shell": ["shfmt"],
+    "sql": ["sql-formatter"],
+    "markdown": ["prettier"],
+    "json": ["biome", "prettier"],
+    "css": ["biome", "prettier"],
+    "yaml": ["prettier"]
+  },
+  "linters": {
+    "javascript": ["oxlint", "biome", "eslint"],
+    "typescript": ["oxlint", "biome", "eslint"],
+    "python": ["ruff"],
+    "go": ["golangci-lint"],
+    "rust": ["clippy"],
+    "shell": ["shellcheck"],
+    "sql": ["sql-lint"],
+    "markdown": ["markdownlint"],
+    "yaml": ["yamllint"],
+    "json": ["biome"],
+    "dockerfile": ["hadolint"]
+  },
+  "typecheckers": {
+    "typescript": ["tsc"]
+  },
+  "testRunners": ["vitest", "jest", "npm test"],
+  "safety": {
+    "blockedCommands": [
+      "rm -rf /",
+      "DROP TABLE",
+      "DROP DATABASE",
+      "TRUNCATE TABLE",
+      "chmod -R 777 /",
+      "git push --force main",
+      "git push --force master",
+      "fork bomb pattern",
+      "dd to block device",
+      "mkfs"
+    ],
+    "protectedFiles": [
+      ".env", ".env.*", "*.env",
+      "*credentials*", "*secrets*", "*secret.*",
+      "*.pem", "*.key", "id_rsa*", "id_ed25519", "id_ecdsa",
+      "*.token", "*.p12", "*.pfx",
+      ".ssh/*", ".aws/credentials", ".gnupg/*"
+    ]
+  },
+  "npxFallback": true,
+  "timeouts": {
+    "format": 5000,
+    "lint": 15000,
+    "typecheck": 30000,
+    "test": 60000
+  },
+  "maxReportLines": 50
+}
