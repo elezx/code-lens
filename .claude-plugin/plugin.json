@@ -4,11 +4,11 @@
   "version": "2.0.0",
   "description": "Full code-lens equivalent for Claude Code: multi-formatter, multi-linter, type checker, bash file detection, safety gates, and test-gating — all via native hooks. Cross-platform single-file Node.js implementation (macOS, Linux, Windows) with zero npm dependencies, config-driven tool preferences, and auto-detection of whatever formatters and linters are actually installed.",
   "author": {
-    "name": "ele",
-    "url": "https://github.com/ele"
+    "name": "elezx",
+    "url": "https://github.com/elezx"
   },
-  "homepage": "https://github.com/ele/code-lens",
-  "repository": "https://github.com/ele/code-lens",
+  "homepage": "https://github.com/elezx/code-lens",
+  "repository": "https://github.com/elezx/code-lens",
   "license": "MIT",
   "keywords": ["code-lens", "harness", "sensors", "linter", "formatter", "type-checker", "safety", "test-gating", "code-quality"],
   "hooks": "./hooks/hooks.json"
