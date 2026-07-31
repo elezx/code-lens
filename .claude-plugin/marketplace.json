@@ -1,0 +1,18 @@
+{
+  "name": "code-lens",
+  "owner": {
+    "name": "elezx",
+    "url": "https://github.com/elezx"
+  },
+  "version": "2.0.0",
+  "description": "Code quality harness for Claude Code — multi-formatter, multi-linter, type checker, bash file detection, safety gates, and test-gating. Cross-platform Node.js, zero dependencies.",
+  "plugins": [
+    {
+      "name": "code-lens",
+      "source": "./",
+      "version": "2.0.0",
+      "description": "Code quality harness for Claude Code — multi-formatter, multi-linter, type checker, bash file detection, safety gates, and test-gating. Cross-platform Node.js, zero dependencies.",
+      "keywords": ["code-quality", "linter", "formatter", "harness", "sensors", "safety", "test-gating"]
+    }
+  ]
+}
